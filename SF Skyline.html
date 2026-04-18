@@ -1,0 +1,1627 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>SF Skyline — 1849 to Today</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  html, body {
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    background: #f4efe8;
+    font-family: "Inter", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+  }
+  body {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 24px; box-sizing: border-box;
+    background:
+      radial-gradient(ellipse at 20% 20%, #faf3e8 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, #f0e6d3 0%, transparent 60%),
+      #ece3d2;
+  }
+  #stage { transform-origin: center center; }
+</style>
+</head>
+<body>
+  <div id="stage"><div id="root"></div></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" data-presets="react">
+
+// iOS.jsx — Simplified iOS 26 (Liquid Glass) device frame
+// Based on the iOS 26 UI Kit + Figma status bar spec. No assets, no deps.
+// Exports: IOSDevice, IOSStatusBar, IOSNavBar, IOSGlassPill, IOSList, IOSListRow, IOSKeyboard
+
+// ─────────────────────────────────────────────────────────────
+// Status bar
+// ─────────────────────────────────────────────────────────────
+function IOSStatusBar({ dark = false, time = '9:41' }) {
+  const c = dark ? '#fff' : '#000';
+  return (
+    <div style={{
+      display: 'flex', gap: 154, alignItems: 'center', justifyContent: 'center',
+      padding: '21px 24px 19px', boxSizing: 'border-box',
+      position: 'relative', zIndex: 20, width: '100%',
+    }}>
+      <div style={{ flex: 1, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: 1.5 }}>
+        <span style={{
+          fontFamily: '-apple-system, "SF Pro", system-ui', fontWeight: 590,
+          fontSize: 17, lineHeight: '22px', color: c,
+        }}>{time}</span>
+      </div>
+      <div style={{ flex: 1, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, paddingTop: 1, paddingRight: 1 }}>
+        <svg width="19" height="12" viewBox="0 0 19 12">
+          <rect x="0" y="7.5" width="3.2" height="4.5" rx="0.7" fill={c}/>
+          <rect x="4.8" y="5" width="3.2" height="7" rx="0.7" fill={c}/>
+          <rect x="9.6" y="2.5" width="3.2" height="9.5" rx="0.7" fill={c}/>
+          <rect x="14.4" y="0" width="3.2" height="12" rx="0.7" fill={c}/>
+        </svg>
+        <svg width="17" height="12" viewBox="0 0 17 12">
+          <path d="M8.5 3.2C10.8 3.2 12.9 4.1 14.4 5.6L15.5 4.5C13.7 2.7 11.2 1.5 8.5 1.5C5.8 1.5 3.3 2.7 1.5 4.5L2.6 5.6C4.1 4.1 6.2 3.2 8.5 3.2Z" fill={c}/>
+          <path d="M8.5 6.8C9.9 6.8 11.1 7.3 12 8.2L13.1 7.1C11.8 5.9 10.2 5.1 8.5 5.1C6.8 5.1 5.2 5.9 3.9 7.1L5 8.2C5.9 7.3 7.1 6.8 8.5 6.8Z" fill={c}/>
+          <circle cx="8.5" cy="10.5" r="1.5" fill={c}/>
+        </svg>
+        <svg width="27" height="13" viewBox="0 0 27 13">
+          <rect x="0.5" y="0.5" width="23" height="12" rx="3.5" stroke={c} strokeOpacity="0.35" fill="none"/>
+          <rect x="2" y="2" width="20" height="9" rx="2" fill={c}/>
+          <path d="M25 4.5V8.5C25.8 8.2 26.5 7.2 26.5 6.5C26.5 5.8 25.8 4.8 25 4.5Z" fill={c} fillOpacity="0.4"/>
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Liquid glass pill — blur + tint + shine
+// ─────────────────────────────────────────────────────────────
+function IOSGlassPill({ children, dark = false, style = {} }) {
+  return (
+    <div style={{
+      height: 44, minWidth: 44, borderRadius: 9999,
+      position: 'relative', overflow: 'hidden',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      boxShadow: dark
+        ? '0 2px 6px rgba(0,0,0,0.35), 0 6px 16px rgba(0,0,0,0.2)'
+        : '0 1px 3px rgba(0,0,0,0.07), 0 3px 10px rgba(0,0,0,0.06)',
+      ...style,
+    }}>
+      {/* blur + tint */}
+      <div style={{
+        position: 'absolute', inset: 0, borderRadius: 9999,
+        backdropFilter: 'blur(12px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(12px) saturate(180%)',
+        background: dark ? 'rgba(120,120,128,0.28)' : 'rgba(255,255,255,0.5)',
+      }} />
+      {/* shine */}
+      <div style={{
+        position: 'absolute', inset: 0, borderRadius: 9999,
+        boxShadow: dark
+          ? 'inset 1.5px 1.5px 1px rgba(255,255,255,0.15), inset -1px -1px 1px rgba(255,255,255,0.08)'
+          : 'inset 1.5px 1.5px 1px rgba(255,255,255,0.7), inset -1px -1px 1px rgba(255,255,255,0.4)',
+        border: dark ? '0.5px solid rgba(255,255,255,0.15)' : '0.5px solid rgba(0,0,0,0.06)',
+      }} />
+      <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', padding: '0 4px' }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Navigation bar — glass pills + large title
+// ─────────────────────────────────────────────────────────────
+function IOSNavBar({ title = 'Title', dark = false, trailingIcon = true }) {
+  const muted = dark ? 'rgba(255,255,255,0.6)' : '#404040';
+  const text = dark ? '#fff' : '#000';
+  const pillIcon = (content) => (
+    <IOSGlassPill dark={dark}>
+      <div style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {content}
+      </div>
+    </IOSGlassPill>
+  );
+  return (
+    <div style={{
+      display: 'flex', flexDirection: 'column', gap: 10,
+      paddingTop: 62, paddingBottom: 10, position: 'relative', zIndex: 5,
+    }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '0 16px',
+      }}>
+        {/* back chevron */}
+        {pillIcon(
+          <svg width="12" height="20" viewBox="0 0 12 20" fill="none" style={{ marginLeft: -1 }}>
+            <path d="M10 2L2 10l8 8" stroke={muted} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        )}
+        {/* trailing ellipsis */}
+        {trailingIcon && pillIcon(
+          <svg width="22" height="6" viewBox="0 0 22 6">
+            <circle cx="3" cy="3" r="2.5" fill={muted}/>
+            <circle cx="11" cy="3" r="2.5" fill={muted}/>
+            <circle cx="19" cy="3" r="2.5" fill={muted}/>
+          </svg>
+        )}
+      </div>
+      {/* large title */}
+      <div style={{
+        padding: '0 16px',
+        fontFamily: '-apple-system, system-ui',
+        fontSize: 34, fontWeight: 700, lineHeight: '41px',
+        color: text, letterSpacing: 0.4,
+      }}>{title}</div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Grouped list (inset card, r:26) + row (52px)
+// ─────────────────────────────────────────────────────────────
+function IOSListRow({ title, detail, icon, chevron = true, isLast = false, dark = false }) {
+  const text = dark ? '#fff' : '#000';
+  const sec = dark ? 'rgba(235,235,245,0.6)' : 'rgba(60,60,67,0.6)';
+  const ter = dark ? 'rgba(235,235,245,0.3)' : 'rgba(60,60,67,0.3)';
+  const sep = dark ? 'rgba(84,84,88,0.65)' : 'rgba(60,60,67,0.12)';
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', minHeight: 52,
+      padding: '0 16px', position: 'relative',
+      fontFamily: '-apple-system, system-ui', fontSize: 17,
+      letterSpacing: -0.43,
+    }}>
+      {icon && (
+        <div style={{
+          width: 30, height: 30, borderRadius: 7, background: icon,
+          marginRight: 12, flexShrink: 0,
+        }} />
+      )}
+      <div style={{ flex: 1, color: text }}>{title}</div>
+      {detail && <span style={{ color: sec, marginRight: 6 }}>{detail}</span>}
+      {chevron && (
+        <svg width="8" height="14" viewBox="0 0 8 14" style={{ flexShrink: 0 }}>
+          <path d="M1 1l6 6-6 6" stroke={ter} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      )}
+      {!isLast && (
+        <div style={{
+          position: 'absolute', bottom: 0, right: 0,
+          left: icon ? 58 : 16, height: 0.5, background: sep,
+        }} />
+      )}
+    </div>
+  );
+}
+
+function IOSList({ header, children, dark = false }) {
+  const hc = dark ? 'rgba(235,235,245,0.6)' : 'rgba(60,60,67,0.6)';
+  const bg = dark ? '#1C1C1E' : '#fff';
+  return (
+    <div>
+      {header && (
+        <div style={{
+          fontFamily: '-apple-system, system-ui', fontSize: 13,
+          color: hc, textTransform: 'uppercase',
+          padding: '8px 36px 6px', letterSpacing: -0.08,
+        }}>{header}</div>
+      )}
+      <div style={{
+        background: bg, borderRadius: 26,
+        margin: '0 16px', overflow: 'hidden',
+      }}>{children}</div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Device frame
+// ─────────────────────────────────────────────────────────────
+function IOSDevice({
+  children, width = 402, height = 874, dark = false,
+  title, keyboard = false,
+}) {
+  return (
+    <div style={{
+      width, height, borderRadius: 48, overflow: 'hidden',
+      position: 'relative', background: dark ? '#000' : '#F2F2F7',
+      boxShadow: '0 40px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.12)',
+      fontFamily: '-apple-system, system-ui, sans-serif',
+      WebkitFontSmoothing: 'antialiased',
+    }}>
+      {/* dynamic island */}
+      <div style={{
+        position: 'absolute', top: 11, left: '50%', transform: 'translateX(-50%)',
+        width: 126, height: 37, borderRadius: 24, background: '#000', zIndex: 50,
+      }} />
+      {/* status bar (absolute) */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 }}>
+        <IOSStatusBar dark={dark} />
+      </div>
+      {/* nav + content */}
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        {title !== undefined && <IOSNavBar title={title} dark={dark} />}
+        <div style={{ flex: 1, overflow: 'auto' }}>{children}</div>
+        {keyboard && <IOSKeyboard dark={dark} />}
+      </div>
+      {/* home indicator — always on top */}
+      <div style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 60,
+        height: 34, display: 'flex', justifyContent: 'center', alignItems: 'flex-end',
+        paddingBottom: 8, pointerEvents: 'none',
+      }}>
+        <div style={{
+          width: 139, height: 5, borderRadius: 100,
+          background: dark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.25)',
+        }} />
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Keyboard — iOS 26 liquid glass
+// ─────────────────────────────────────────────────────────────
+function IOSKeyboard({ dark = false }) {
+  const glyph = dark ? 'rgba(255,255,255,0.7)' : '#595959';
+  const sugg = dark ? 'rgba(255,255,255,0.6)' : '#333';
+  const keyBg = dark ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.85)';
+
+  // special-key icons
+  const icons = {
+    shift: <svg width="19" height="17" viewBox="0 0 19 17"><path d="M9.5 1L1 9.5h4.5V16h8V9.5H18L9.5 1z" fill={glyph}/></svg>,
+    del: <svg width="23" height="17" viewBox="0 0 23 17"><path d="M7 1h13a2 2 0 012 2v11a2 2 0 01-2 2H7l-6-7.5L7 1z" fill="none" stroke={glyph} strokeWidth="1.6" strokeLinejoin="round"/><path d="M10 5l7 7M17 5l-7 7" stroke={glyph} strokeWidth="1.6" strokeLinecap="round"/></svg>,
+    ret: <svg width="20" height="14" viewBox="0 0 20 14"><path d="M18 1v6H4m0 0l4-4M4 7l4 4" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  };
+
+  const key = (content, { w, flex, ret, fs = 25, k } = {}) => (
+    <div key={k} style={{
+      height: 42, borderRadius: 8.5,
+      flex: flex ? 1 : undefined, width: w, minWidth: 0,
+      background: ret ? '#08f' : keyBg,
+      boxShadow: '0 1px 0 rgba(0,0,0,0.075)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontFamily: '-apple-system, "SF Compact", system-ui',
+      fontSize: fs, fontWeight: 458, color: ret ? '#fff' : glyph,
+    }}>{content}</div>
+  );
+
+  const row = (keys, pad = 0) => (
+    <div style={{ display: 'flex', gap: 6.5, justifyContent: 'center', padding: `0 ${pad}px` }}>
+      {keys.map(l => key(l, { flex: true, k: l }))}
+    </div>
+  );
+
+  return (
+    <div style={{
+      position: 'relative', zIndex: 15, borderRadius: 27, overflow: 'hidden',
+      padding: '11px 0 2px',
+      display: 'flex', flexDirection: 'column', alignItems: 'center',
+      boxShadow: dark
+        ? '0 -2px 20px rgba(0,0,0,0.09)'
+        : '0 -1px 6px rgba(0,0,0,0.018), 0 -3px 20px rgba(0,0,0,0.012)',
+    }}>
+      {/* liquid glass bg — same recipe as nav pills */}
+      <div style={{
+        position: 'absolute', inset: 0, borderRadius: 27,
+        backdropFilter: 'blur(12px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(12px) saturate(180%)',
+        background: dark ? 'rgba(120,120,128,0.14)' : 'rgba(255,255,255,0.25)',
+      }} />
+      <div style={{
+        position: 'absolute', inset: 0, borderRadius: 27,
+        boxShadow: dark
+          ? 'inset 1.5px 1.5px 1px rgba(255,255,255,0.15)'
+          : 'inset 1.5px 1.5px 1px rgba(255,255,255,0.7), inset -1px -1px 1px rgba(255,255,255,0.4)',
+        border: dark ? '0.5px solid rgba(255,255,255,0.15)' : '0.5px solid rgba(0,0,0,0.06)',
+        pointerEvents: 'none',
+      }} />
+
+      {/* autocorrect bar */}
+      <div style={{
+        display: 'flex', gap: 20, alignItems: 'center',
+        padding: '8px 22px 13px', width: '100%', boxSizing: 'border-box',
+        position: 'relative',
+      }}>
+        {['"The"', 'the', 'to'].map((w, i) => (
+          <React.Fragment key={i}>
+            {i > 0 && <div style={{ width: 1, height: 25, background: '#ccc', opacity: 0.3 }} />}
+            <div style={{
+              flex: 1, textAlign: 'center',
+              fontFamily: '-apple-system, system-ui', fontSize: 17,
+              color: sugg, letterSpacing: -0.43, lineHeight: '22px',
+            }}>{w}</div>
+          </React.Fragment>
+        ))}
+      </div>
+
+      {/* key layout */}
+      <div style={{
+        display: 'flex', flexDirection: 'column', gap: 13,
+        padding: '0 6.5px', width: '100%', boxSizing: 'border-box',
+        position: 'relative',
+      }}>
+        {row(['q','w','e','r','t','y','u','i','o','p'])}
+        {row(['a','s','d','f','g','h','j','k','l'], 20)}
+        <div style={{ display: 'flex', gap: 14.25, alignItems: 'center' }}>
+          {key(icons.shift, { w: 45, k: 'shift' })}
+          <div style={{ display: 'flex', gap: 6.5, flex: 1 }}>
+            {['z','x','c','v','b','n','m'].map(l => key(l, { flex: true, k: l }))}
+          </div>
+          {key(icons.del, { w: 45, k: 'del' })}
+        </div>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          {key('ABC', { w: 92.25, fs: 18, k: 'abc' })}
+          {key('', { flex: true, k: 'space' })}
+          {key(icons.ret, { w: 92.25, ret: true, k: 'ret' })}
+        </div>
+      </div>
+
+      {/* bottom spacer (emoji+mic area, icons omitted) */}
+      <div style={{ height: 56, width: '100%', position: 'relative' }} />
+    </div>
+  );
+}
+
+Object.assign(window, {
+  IOSDevice, IOSStatusBar, IOSNavBar, IOSGlassPill, IOSList, IOSListRow, IOSKeyboard,
+});
+
+
+// SF skyline era data — geographically ordered (west → east from Golden Gate to Bay Bridge)
+// Canvas: 0-1000 horizontal. x = horizontal center region of building.
+// elev (optional): pixels of upward offset for buildings on hills.
+
+const BUILDINGS = [
+  // ─────────── 1849–1860: Gold Rush shacks
+  // Shacks cluster around Yerba Buena Cove (center-right, where FiDi now is)
+  { id: 'shack1', firstYear: 1849, removeYear: 1906, x: 420, w: 28, h: 28, kind: 'shack' },
+  { id: 'shack2', firstYear: 1850, removeYear: 1906, x: 460, w: 24, h: 24, kind: 'shack' },
+  { id: 'shack3', firstYear: 1850, removeYear: 1906, x: 500, w: 30, h: 32, kind: 'shack' },
+  { id: 'shack4', firstYear: 1852, removeYear: 1906, x: 540, w: 26, h: 30, kind: 'shack' },
+  { id: 'shack5', firstYear: 1852, removeYear: 1906, x: 580, w: 30, h: 34, kind: 'shack' },
+  { id: 'shack6', firstYear: 1855, removeYear: 1906, x: 620, w: 24, h: 26, kind: 'shack' },
+  { id: 'shack7', firstYear: 1855, removeYear: 1906, x: 660, w: 28, h: 30, kind: 'shack' },
+  { id: 'shack8', firstYear: 1856, removeYear: 1906, x: 700, w: 30, h: 34, kind: 'shack' },
+  // Shacks on hills
+  { id: 'shack9', firstYear: 1853, removeYear: 1906, x: 260, w: 22, h: 24, kind: 'shack', elev: 72 },
+  { id: 'shack10', firstYear: 1855, removeYear: 1906, x: 340, w: 24, h: 26, kind: 'shack', elev: 84 },
+  { id: 'shack11', firstYear: 1858, removeYear: 1906, x: 380, w: 22, h: 24, kind: 'shack', elev: 74 },
+
+  // ─────────── 1870s Victorian boom — row houses on Nob Hill + Pac Heights + FiDi masonry
+  { id: 'vic_ph1', firstYear: 1872, removeYear: 1906, x: 180, w: 32, h: 56, kind: 'vic', elev: 55 },
+  { id: 'vic_ph2', firstYear: 1874, removeYear: 1906, x: 218, w: 30, h: 52, kind: 'vic', elev: 68 },
+  { id: 'vic_nob1', firstYear: 1875, removeYear: 1906, x: 310, w: 34, h: 58, kind: 'vic', elev: 84 },
+  { id: 'vic_nob2', firstYear: 1878, removeYear: 1906, x: 362, w: 36, h: 62, kind: 'vic', elev: 86 },
+  { id: 'vic_rh',  firstYear: 1876, removeYear: 1906, x: 258, w: 32, h: 56, kind: 'vic', elev: 80 },
+  // Palace Hotel (original 1875) — on Market St, roughly center-south
+  { id: 'palace_old', firstYear: 1875, removeYear: 1906, x: 560, w: 54, h: 88, kind: 'blk', name: 'Palace Hotel (original)' },
+  // Old St. Mary's (1854) on California St, Chinatown edge
+  { id: 'stmarys', firstYear: 1875, x: 440, w: 30, h: 92, kind: 'church', name: 'Old St. Mary\u2019s' },
+  // Generic Victorian/masonry fill in FiDi
+  { id: 'vic_f1', firstYear: 1880, removeYear: 1906, x: 460, w: 36, h: 62, kind: 'vic' },
+  { id: 'vic_f2', firstYear: 1884, removeYear: 1906, x: 500, w: 40, h: 70, kind: 'vic' },
+  { id: 'blk_f1', firstYear: 1888, removeYear: 1906, x: 620, w: 46, h: 84, kind: 'blk' },
+  { id: 'blk_f2', firstYear: 1890, removeYear: 1906, x: 670, w: 42, h: 78, kind: 'blk' },
+
+  // ─────────── 1890s–1906 pre-quake
+  // Call Building (1898) — was on Market St at 3rd; in our layout center-right of FiDi
+  { id: 'callbldg', firstYear: 1898, removeYear: 1906, x: 540, w: 40, h: 150, kind: 'ornate', name: 'Call Building' },
+  // Ferry Building (1898) — on the waterfront, Embarcadero; in our frame, center-right just before Bay Bridge
+  { id: 'ferry', firstYear: 1898, x: 810, w: 42, h: 110, kind: 'ferry', name: 'Ferry Building' },
+  // Fairmont Hotel (1907) — on top of Nob Hill, elevated
+  { id: 'fairmont', firstYear: 1907, x: 330, w: 60, h: 92, kind: 'classical', name: 'Fairmont Hotel', elev: 90 },
+
+  // ─────────── 1908–1915 Rebuild / Pan-Pacific
+  // City Hall (1915) — Civic Center, but visible inland; in our scene, left-mid
+  { id: 'cityhall', firstYear: 1915, x: 150, w: 70, h: 130, kind: 'dome', name: 'City Hall' },
+  // Palace Hotel (rebuilt 1909) — same spot
+  { id: 'palace_new', firstYear: 1909, x: 560, w: 54, h: 96, kind: 'classical', name: 'Palace Hotel (rebuilt)' },
+  // St Francis Hotel (1913) — Union Square area
+  { id: 'stfrancis', firstYear: 1913, x: 500, w: 48, h: 98, kind: 'classical', name: 'St. Francis Hotel' },
+  // Montgomery Block — FiDi edge
+  { id: 'mont_block', firstYear: 1908, x: 610, w: 42, h: 92, kind: 'blk' },
+  // Palace of Fine Arts (1915, Marina) — far left
+  { id: 'panpac_col', firstYear: 1915, removeYear: 1918, x: 90, w: 54, h: 100, kind: 'colonnade', name: 'Palace of Fine Arts' },
+
+  // ─────────── 1920s–30s Art Deco
+  // 450 Sutter (1929) — FiDi, center
+  { id: '450sut', firstYear: 1929, x: 505, w: 38, h: 168, kind: 'art', name: '450 Sutter' },
+  // Shell Building (1929) — 100 Bush, FiDi
+  { id: 'shell', firstYear: 1929, x: 560, w: 34, h: 160, kind: 'art', name: 'Shell Building' },
+  // Russ Building (1927) — 235 Montgomery, FiDi
+  { id: 'russ', firstYear: 1927, x: 600, w: 36, h: 158, kind: 'art', name: 'Russ Building' },
+  // Coit Tower (1933) — Telegraph Hill, far left edge of FiDi, HIGH ELEVATION
+  { id: 'coit', firstYear: 1933, x: 412, w: 22, h: 96, kind: 'spire', name: 'Coit Tower', elev: 110 },
+
+  // ─────────── 1936–37 Bridges
+  { id: 'ggbridge', firstYear: 1937, x: 0, w: 0, h: 0, kind: 'bridge-gg' },
+  { id: 'baybridge', firstYear: 1936, x: 0, w: 0, h: 0, kind: 'bridge-bay' },
+
+  // ─────────── 1950s–60s Mid-century
+  { id: 'mid_pac', firstYear: 1964, x: 580, w: 44, h: 210, kind: 'mid', name: 'Pacific Telephone' },
+  { id: 'mid_crown', firstYear: 1961, x: 370, w: 34, h: 120, kind: 'mid', elev: 80 }, // Nob Hill apartments
+  { id: 'hyatt_reg', firstYear: 1973, x: 760, w: 52, h: 170, kind: 'mid', name: 'Hyatt Regency' },
+  { id: 'bofa', firstYear: 1969, x: 490, w: 56, h: 270, kind: 'bofa', name: '555 California (BofA)', dark: true },
+
+  // ─────────── 1972 Transamerica
+  { id: 'transam', firstYear: 1972, x: 560, w: 48, h: 320, kind: 'tent', name: 'Transamerica Pyramid' },
+
+  // ─────────── 1980s Embarcadero Center (4 towers, right of FiDi toward waterfront)
+  { id: 'embarc1', firstYear: 1971, x: 660, w: 38, h: 220, kind: 'mod', name: 'Embarcadero Center 1' },
+  { id: 'embarc2', firstYear: 1974, x: 698, w: 38, h: 230, kind: 'mod', name: 'Embarcadero Center 2' },
+  { id: 'embarc3', firstYear: 1976, x: 736, w: 38, h: 240, kind: 'mod', name: 'Embarcadero Center 3' },
+  { id: 'embarc4', firstYear: 1982, x: 774, w: 38, h: 245, kind: 'mod', name: 'Embarcadero Center 4' },
+  // 101 California (1982)
+  { id: '101cal', firstYear: 1982, x: 540, w: 40, h: 248, kind: 'mod', name: '101 California' },
+  // Marriott Marquis (1989) — SoMa
+  { id: 'marriott', firstYear: 1989, x: 720, w: 46, h: 250, kind: 'marriott', name: 'Marriott Marquis' },
+
+  // ─────────── 2000s dot-com (SoMa)
+  { id: '555mis', firstYear: 2003, x: 680, w: 38, h: 260, kind: 'mod', name: '555 Mission' },
+  { id: 'fourseas', firstYear: 2001, x: 650, w: 32, h: 200, kind: 'mod' },
+  { id: 'paramount', firstYear: 2002, x: 718, w: 34, h: 220, kind: 'mod', name: 'Paramount' },
+  // Millennium Tower (2009) — SoMa / Rincon
+  { id: 'millennium', firstYear: 2009, x: 640, w: 38, h: 290, kind: 'mod', name: 'Millennium Tower' },
+
+  // ─────────── 2018 Salesforce era
+  { id: 'sftower', firstYear: 2018, x: 620, w: 48, h: 400, kind: 'obelisk', name: 'Salesforce Tower' },
+  { id: '181fremont', firstYear: 2018, x: 672, w: 32, h: 340, kind: 'mod', name: '181 Fremont' },
+  { id: 'oneric', firstYear: 2008, x: 750, w: 36, h: 270, kind: 'mod', name: 'One Rincon Hill' },
+  // Infinity Towers (2009)
+  { id: 'infinity', firstYear: 2009, x: 792, w: 28, h: 210, kind: 'mod' },
+
+  // ─────────── Present
+  { id: 'mira', firstYear: 2020, x: 610, w: 36, h: 280, kind: 'twist', name: 'MIRA' },
+  { id: 'oceanwide', firstYear: 2024, x: 700, w: 36, h: 320, kind: 'mod', name: 'Oceanwide' },
+  // Park Tower (2018)
+  { id: 'parktower', firstYear: 2018, x: 576, w: 34, h: 270, kind: 'mod', name: 'Park Tower' },
+];
+
+// Eras unchanged (content-wise, just references)
+const ERAS = [
+  { year: 1850, title: 'Gold Rush Village',
+    caption: 'Tents and wooden shacks crowd the shore of Yerba Buena Cove. The bay is full of abandoned ships — their crews gone to the gold fields.',
+    pop: 34776, landmark: 'Yerba Buena Cove' },
+  { year: 1875, title: 'Victorian Boom',
+    caption: 'Cable cars climb the hills. Ornate wooden row houses multiply on Nob Hill and Pacific Heights as silver from the Comstock Lode pours into the city.',
+    pop: 233959, landmark: 'Palace Hotel opens (1875)' },
+  { year: 1905, title: 'Paris of the West',
+    caption: 'The Call Building and Ferry Building crown a dense, masonry skyline. San Francisco is the financial capital of the West Coast.',
+    pop: 410000, landmark: 'Call Building \u2022 Ferry Building' },
+  { year: 1906, title: 'Earthquake & Fire',
+    caption: 'At 5:12 a.m. on April 18, a magnitude 7.9 quake strikes. Three days of fire consume 500 city blocks. 80% of the city is destroyed.',
+    pop: 400000, landmark: 'Three days of fire', event: 'quake' },
+  { year: 1915, title: 'Pan-Pacific Rebuild',
+    caption: 'In just nine years, the city rebuilds itself grander than before. The Panama-Pacific Exposition announces SF\u2019s return to the world.',
+    pop: 458000, landmark: 'City Hall \u2022 Palace of Fine Arts' },
+  { year: 1937, title: 'Bridges to the World',
+    caption: 'The Bay Bridge (1936) and Golden Gate Bridge (1937) open within six months of each other. The city is no longer an island.',
+    pop: 634000, landmark: 'Golden Gate Bridge opens' },
+  { year: 1965, title: 'Mid-Century Modern',
+    caption: 'International-style towers replace Victorian blocks downtown. The Financial District starts its vertical climb.',
+    pop: 742000, landmark: '555 California rises' },
+  { year: 1972, title: 'The Pyramid',
+    caption: 'The Transamerica Pyramid is completed at the north end of the Financial District — controversial at first, now the city\u2019s most-loved silhouette.',
+    pop: 715674, landmark: 'Transamerica Pyramid (853 ft)' },
+  { year: 1989, title: 'Skyline Cap',
+    caption: 'After the 1985 "Manhattanization" backlash, Prop M caps office growth. Embarcadero Center and 101 California define the profile.',
+    pop: 723959, landmark: 'Embarcadero Center complete' },
+  { year: 2005, title: 'Dot-com City',
+    caption: 'Tech money reshapes SoMa. Live-work lofts and mid-rises fill the south of Market.',
+    pop: 776733, landmark: '555 Mission \u2022 Paramount' },
+  { year: 2018, title: 'Salesforce Tower',
+    caption: 'Salesforce Tower opens at 1,070 ft — the tallest building in SF. A new transit-centric downtown core emerges in SoMa.',
+    pop: 884108, landmark: 'Salesforce Tower (1,070 ft)' },
+  { year: 2026, title: 'Today',
+    caption: 'Post-pandemic, downtown reinvents itself again. The skyline is denser, taller, and more varied than any point in its 177 years.',
+    pop: 808988, landmark: 'Present day' },
+];
+
+window.BUILDINGS = BUILDINGS;
+window.ERAS = ERAS;
+
+
+// Skyline renderer — period-appropriate illustrated SVG
+// Uses window.BUILDINGS. Renders only buildings whose firstYear <= year and (removeYear === undefined || year < removeYear),
+// with a fade-in over a few years after firstYear for "under construction" feel.
+
+// Palette interpolation: 1849 → 2026, sepia → full color.
+// Returns { sky: [top,bot], water, fog, bldg (base fill), bldgShade, accent }
+function paletteFor(year, mode = 'shift', dark = false) {
+  // t: 0 (sepia, 1849) → 1 (modern, 2026)
+  const t = Math.max(0, Math.min(1, (year - 1849) / (2026 - 1849)));
+
+  if (mode === 'shift') {
+    if (dark) {
+      return {
+        skyTop: lerpColor('#1a1418', '#0b1222', t),
+        skyBot: lerpColor('#3b2a24', '#1e2a3d', t),
+        sun:   lerpColor('#f0c590', '#f5d8a8', t),
+        water: lerpColor('#2a211c', '#0e1826', t),
+        fog:   `rgba(${lerp(220, 200, t)}, ${lerp(200, 210, t)}, ${lerp(180, 220, t)}, 0.35)`,
+        bldgA: lerpColor('#6b4a35', '#2b3542', t),
+        bldgB: lerpColor('#4a2f22', '#1a2230', t),
+        bldgC: lerpColor('#2d1a12', '#0c121c', t),
+        accent: lerpColor('#d2a56b', '#6ba8d4', t),
+        windowGlow: lerpColor('#f2c78a', '#f5e0a8', t),
+      };
+    }
+    return {
+      skyTop: lerpColor('#f0d9b8', '#cfe6f0', t),           // warm parchment → soft sky blue
+      skyBot: lerpColor('#e8c592', '#f5d8c2', t),           // sepia → peach horizon (retain SF warmth)
+      sun:   lerpColor('#e8a65a', '#f4c77e', t),
+      water: lerpColor('#a88462', '#86a8b8', t),
+      fog:   `rgba(${lerp(230, 240, t)}, ${lerp(215, 235, t)}, ${lerp(190, 235, t)}, ${lerp(0.45, 0.35, t)})`,
+      bldgA: lerpColor('#8b6a4a', '#8093a3', t),            // far background (lightest)
+      bldgB: lerpColor('#6b4b32', '#5a6c7d', t),            // mid
+      bldgC: lerpColor('#4a2f1f', '#37424f', t),            // fore (darkest)
+      accent: lerpColor('#b87333', '#c94f4f', t),            // copper → tower red
+      windowGlow: lerpColor('#f4d89a', '#fff3c2', t),
+    };
+  }
+  if (mode === 'fog') {
+    return {
+      skyTop: '#dde4ea', skyBot: '#eef1f3', sun: '#f4e7d2', water: '#8ea0ab',
+      fog: 'rgba(240,240,240,0.55)',
+      bldgA: '#a0adb5', bldgB: '#7b8a94', bldgC: '#4f5d67',
+      accent: '#c94f4f', windowGlow: '#fff5d6',
+    };
+  }
+  // sunset
+  return {
+    skyTop: '#ef8b5a', skyBot: '#fbc98c', sun: '#fff0b8', water: '#d38b5a',
+    fog: 'rgba(255, 220, 190, 0.28)',
+    bldgA: '#8a5a3f', bldgB: '#5a3624', bldgC: '#2a160c',
+    accent: '#fff0b8', windowGlow: '#ffd78a',
+  };
+}
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+function lerpColor(a, b, t) {
+  const pa = hexToRgb(a), pb = hexToRgb(b);
+  const r = Math.round(lerp(pa[0], pb[0], t));
+  const g = Math.round(lerp(pa[1], pb[1], t));
+  const bl = Math.round(lerp(pa[2], pb[2], t));
+  return `rgb(${r}, ${g}, ${bl})`;
+}
+function hexToRgb(h) {
+  const n = h.replace('#','');
+  return [parseInt(n.slice(0,2),16), parseInt(n.slice(2,4),16), parseInt(n.slice(4,6),16)];
+}
+
+// How buildings are drawn — each kind is an SVG path builder that returns an array of <path>/<rect>.
+// baseline y = 0 means standing on the waterline; we translate per building.
+// Note: we draw with y going up (we'll flip with scale).
+function renderBuilding(b, pal, opacity, depth, showLabels, onTap) {
+  const { x, w, h, kind, name, id, dark, elev = 0 } = b;
+  // depth: 0=back, 1=mid, 2=fore — used to pick shade
+  const shades = [pal.bldgA, pal.bldgB, pal.bldgC];
+  const fill = dark ? pal.bldgC : shades[depth];
+  const winFill = pal.windowGlow;
+
+  const pieces = [];
+  switch (kind) {
+    case 'shack': {
+      // peaked roof hut
+      pieces.push(<polygon key="r" points={`${x},${-h*0.55} ${x + w/2},${-h} ${x+w},${-h*0.55} ${x+w},0 ${x},0`} fill={fill}/>);
+      pieces.push(<rect key="d" x={x + w*0.4} y={-h*0.35} width={w*0.18} height={h*0.35} fill={shades[2]} opacity="0.6"/>);
+      break;
+    }
+    case 'vic': {
+      pieces.push(<rect key="b" x={x} y={-h*0.82} width={w} height={h*0.82} fill={fill}/>);
+      pieces.push(<polygon key="r" points={`${x},${-h*0.82} ${x+w/2},${-h} ${x+w},${-h*0.82}`} fill={shades[Math.min(depth+1,2)]}/>);
+      // bay window
+      pieces.push(<rect key="bw" x={x+w*0.15} y={-h*0.55} width={w*0.3} height={h*0.25} fill={winFill} opacity="0.65"/>);
+      pieces.push(<rect key="bw2" x={x+w*0.55} y={-h*0.55} width={w*0.3} height={h*0.25} fill={winFill} opacity="0.5"/>);
+      break;
+    }
+    case 'blk': {
+      pieces.push(<rect key="b" x={x} y={-h} width={w} height={h} fill={fill}/>);
+      // window grid
+      const cols = 3, rows = Math.floor(h / 16);
+      for (let c=0; c<cols; c++) for (let r=0; r<rows; r++) {
+        pieces.push(<rect key={`w${c}${r}`} x={x + w*0.15 + c*(w*0.25)} y={-h + 10 + r*14} width={w*0.14} height={7} fill={winFill} opacity="0.55"/>);
+      }
+      break;
+    }
+    case 'church': {
+      pieces.push(<rect key="b" x={x+w*0.25} y={-h*0.6} width={w*0.5} height={h*0.6} fill={fill}/>);
+      pieces.push(<rect key="t" x={x+w*0.4} y={-h*0.92} width={w*0.2} height={h*0.3} fill={fill}/>);
+      pieces.push(<polygon key="s" points={`${x+w*0.4},${-h*0.92} ${x+w*0.5},${-h} ${x+w*0.6},${-h*0.92}`} fill={shades[2]}/>);
+      break;
+    }
+    case 'ornate': { // Call Building — slim with domed top
+      pieces.push(<rect key="b" x={x} y={-h*0.85} width={w} height={h*0.85} fill={fill}/>);
+      pieces.push(<ellipse key="d" cx={x+w/2} cy={-h*0.85} rx={w*0.55} ry={h*0.08} fill={fill}/>);
+      pieces.push(<rect key="s" x={x+w*0.45} y={-h} width={w*0.1} height={h*0.15} fill={shades[2]}/>);
+      // windows
+      for (let r=0;r<Math.floor(h/18);r++) {
+        pieces.push(<rect key={`w${r}`} x={x+w*0.2} y={-h*0.8 + r*16} width={w*0.6} height={5} fill={winFill} opacity="0.45"/>);
+      }
+      break;
+    }
+    case 'ferry': { // Ferry Building clock tower silhouette
+      pieces.push(<rect key="b" x={x-w*0.8} y={-h*0.35} width={w*2.6} height={h*0.35} fill={fill}/>);
+      pieces.push(<rect key="t" x={x+w*0.2} y={-h} width={w*0.6} height={h} fill={fill}/>);
+      pieces.push(<rect key="c" x={x+w*0.3} y={-h*0.75} width={w*0.4} height={w*0.4} fill={winFill} opacity="0.7"/>);
+      pieces.push(<polygon key="s" points={`${x+w*0.3},${-h} ${x+w*0.5},${-h*1.12} ${x+w*0.7},${-h}`} fill={shades[2]}/>);
+      break;
+    }
+    case 'classical': {
+      pieces.push(<rect key="b" x={x} y={-h} width={w} height={h} fill={fill}/>);
+      pieces.push(<rect key="cap" x={x-w*0.05} y={-h} width={w*1.1} height={h*0.05} fill={shades[2]}/>);
+      for (let c=0;c<4;c++) for (let r=0;r<Math.floor(h/18);r++) {
+        pieces.push(<rect key={`w${c}${r}`} x={x+w*0.1+c*(w*0.22)} y={-h+12+r*16} width={w*0.13} height={6} fill={winFill} opacity="0.4"/>);
+      }
+      break;
+    }
+    case 'dome': {
+      pieces.push(<rect key="b" x={x} y={-h*0.55} width={w} height={h*0.55} fill={fill}/>);
+      pieces.push(<path key="d" d={`M ${x+w*0.25} ${-h*0.55} Q ${x+w/2} ${-h*1.02}, ${x+w*0.75} ${-h*0.55} Z`} fill={fill}/>);
+      pieces.push(<rect key="l" x={x+w*0.47} y={-h*1.1} width={w*0.06} height={h*0.1} fill={fill}/>);
+      break;
+    }
+    case 'colonnade': { // Palace of Fine Arts rotunda
+      pieces.push(<path key="d" d={`M ${x} ${-h*0.7} Q ${x+w/2} ${-h}, ${x+w} ${-h*0.7} L ${x+w} 0 L ${x} 0 Z`} fill={fill} opacity="0.85"/>);
+      for (let i=0;i<5;i++) {
+        pieces.push(<rect key={`c${i}`} x={x+w*0.1+i*(w*0.2)} y={-h*0.55} width={w*0.05} height={h*0.55} fill={shades[2]} opacity="0.5"/>);
+      }
+      break;
+    }
+    case 'art': { // art deco stepped
+      pieces.push(<rect key="b" x={x} y={-h*0.75} width={w} height={h*0.75} fill={fill}/>);
+      pieces.push(<rect key="s1" x={x+w*0.1} y={-h*0.9} width={w*0.8} height={h*0.15} fill={fill}/>);
+      pieces.push(<rect key="s2" x={x+w*0.25} y={-h} width={w*0.5} height={h*0.1} fill={shades[2]}/>);
+      pieces.push(<rect key="spire" x={x+w*0.46} y={-h*1.05} width={w*0.08} height={h*0.05} fill={shades[2]}/>);
+      for (let c=0;c<3;c++) for (let r=0;r<Math.floor(h/14);r++) {
+        pieces.push(<rect key={`w${c}${r}`} x={x+w*0.15+c*(w*0.28)} y={-h*0.7 + r*12} width={w*0.16} height={4} fill={winFill} opacity="0.45"/>);
+      }
+      break;
+    }
+    case 'spire': { // Coit
+      pieces.push(<rect key="b" x={x} y={-h*0.92} width={w} height={h*0.92} fill={fill}/>);
+      pieces.push(<rect key="t" x={x+w*0.15} y={-h} width={w*0.7} height={h*0.08} fill={shades[2]}/>);
+      break;
+    }
+    case 'mid': { // mid-century box
+      pieces.push(<rect key="b" x={x} y={-h} width={w} height={h} fill={fill}/>);
+      // vertical window lines
+      for (let c=0;c<4;c++) {
+        pieces.push(<rect key={`v${c}`} x={x+w*0.1+c*(w*0.25)} y={-h+6} width={w*0.05} height={h-12} fill={winFill} opacity="0.28"/>);
+      }
+      break;
+    }
+    case 'tent': { // Transamerica
+      pieces.push(<polygon key="b" points={`${x+w/2},${-h} ${x},0 ${x+w},0`} fill={fill}/>);
+      pieces.push(<rect key="s" x={x+w*0.47} y={-h*1.07} width={w*0.06} height={h*0.08} fill={shades[2]}/>);
+      // wings
+      pieces.push(<polygon key="wl" points={`${x-w*0.05},${-h*0.25} ${x},${-h*0.18} ${x+w*0.1},${-h*0.4} ${x+w*0.15},0 ${x},0`} fill={shades[2]}/>);
+      pieces.push(<polygon key="wr" points={`${x+w*1.05},${-h*0.25} ${x+w},${-h*0.18} ${x+w*0.9},${-h*0.4} ${x+w*0.85},0 ${x+w},0`} fill={shades[2]}/>);
+      break;
+    }
+    case 'mod': { // modern glass
+      pieces.push(<rect key="b" x={x} y={-h} width={w} height={h} fill={fill}/>);
+      // glass cladding — horizontal bands
+      for (let r=0;r<Math.floor(h/9);r++) {
+        pieces.push(<rect key={`g${r}`} x={x+1} y={-h+4+r*8} width={w-2} height={3} fill={winFill} opacity="0.18"/>);
+      }
+      // edge highlight
+      pieces.push(<rect key="edge" x={x+w-3} y={-h} width={2} height={h} fill="#fff" opacity="0.15"/>);
+      break;
+    }
+    case 'obelisk': { // Salesforce Tower — tapered w/ rounded top
+      pieces.push(<path key="b" d={`M ${x+w*0.1} 0 L ${x} ${-h*0.3} L ${x+w*0.08} ${-h*0.92} Q ${x+w/2} ${-h*1.02}, ${x+w*0.92} ${-h*0.92} L ${x+w} ${-h*0.3} L ${x+w*0.9} 0 Z`} fill={fill}/>);
+      // glass bands
+      for (let r=0;r<Math.floor(h/8);r++) {
+        pieces.push(<rect key={`g${r}`} x={x+w*0.12} y={-h*0.9+r*7} width={w*0.76} height={2.5} fill={winFill} opacity="0.22"/>);
+      }
+      pieces.push(<rect key="glow" x={x+w*0.35} y={-h*1.01} width={w*0.3} height={4} fill={pal.accent} opacity="0.9" rx="2"/>);
+      break;
+    }
+    case 'marriott': { // Marriott Marquis fan top
+      pieces.push(<rect key="b" x={x} y={-h*0.75} width={w} height={h*0.75} fill={fill}/>);
+      pieces.push(<path key="f" d={`M ${x+w*0.1} ${-h*0.75} L ${x+w*0.5} ${-h} L ${x+w*0.9} ${-h*0.75} Z`} fill={fill}/>);
+      pieces.push(<path key="f2" d={`M ${x+w*0.2} ${-h*0.75} L ${x+w*0.5} ${-h*0.92} L ${x+w*0.8} ${-h*0.75} Z`} fill={shades[2]}/>);
+      break;
+    }
+    case 'twist': { // MIRA — twisted tower (stepped segmented stack)
+      const segs = 8;
+      for (let i=0; i<segs; i++) {
+        const sy = -h * (i+1)/segs;
+        const ey = -h * i/segs;
+        const off = Math.sin(i*0.6) * w * 0.08;
+        pieces.push(<polygon key={`t${i}`}
+          points={`${x+off} ${sy} ${x+w+off} ${sy} ${x+w-off*0.2} ${ey} ${x-off*0.2} ${ey}`}
+          fill={i%2?fill:shades[Math.min(depth+1,2)]} />);
+      }
+      break;
+    }
+    case 'bridge-gg':
+    case 'bridge-bay':
+      return null; // drawn separately
+    default:
+      pieces.push(<rect key="b" x={x} y={-h} width={w} height={h} fill={fill}/>);
+  }
+
+  const tapHandler = name && onTap ? () => onTap({ id, name, year: b.firstYear, x, y: -h }) : undefined;
+
+  return (
+    <g key={id} opacity={opacity}
+       transform={elev ? `translate(0 ${-elev})` : undefined}
+       style={{ cursor: name ? 'pointer' : 'default' }} onClick={tapHandler}>
+      {pieces}
+    </g>
+  );
+}
+
+// Background hills — distinct SF topography:
+// In viewBox y-space: waterline at y=400. Peaks rise ABOVE (smaller y).
+// Layout by x coordinate:
+//   80-140  : Pacific Heights ridge (moderate, peak ~y=340)
+//   230-290 : Russian Hill (prominent, peak ~y=310)
+//   310-390 : Nob Hill (tallest residential hill, peak ~y=295)
+//   400-440 : Telegraph Hill (sharp, peak ~y=280 — where Coit stands)
+//   780-830 : Rincon Hill (modest, peak ~y=335)
+// Baseline is y=340 elsewhere. Far range (Twin Peaks/Mt. Sutro) sits behind.
+function HillsBackdrop({ pal }) {
+  // Far mountain range (Twin Peaks, Mt. Sutro, Mt. Davidson) — hazy behind
+  const farRange = `
+    M 0 345
+    Q 80 320, 160 328
+    Q 240 305, 320 315
+    Q 400 300, 480 312
+    Q 560 308, 640 320
+    Q 720 315, 800 328
+    Q 880 320, 1000 335
+    L 1000 400 L 0 400 Z
+  `;
+  // Near hills — the actual topography the city sits on
+  // Key peaks at y-values: lower y = higher hill
+  const nearHills = `
+    M 0 400
+    L 0 360
+    L 40 348
+    L 90 340            /* Presidio ridge */
+    L 150 350
+    L 200 355
+    L 230 340
+    L 260 315           /* Russian Hill peak */
+    L 285 320
+    L 305 335
+    L 325 318
+    L 355 295           /* Nob Hill peak */
+    L 380 300
+    L 400 325
+    L 412 290           /* Telegraph Hill peak */
+    L 425 295
+    L 440 325
+    L 465 345
+    L 770 348
+    L 790 338
+    L 810 332           /* Rincon Hill peak */
+    L 830 340
+    L 860 348
+    L 920 352
+    L 1000 360
+    L 1000 400 Z
+  `;
+  return (
+    <g>
+      {/* Far range (Twin Peaks behind the city) */}
+      <path d={farRange} fill={pal.bldgA} opacity="0.4"/>
+      {/* Near hills — city topography */}
+      <path d={nearHills} fill={pal.bldgA} opacity="0.85"/>
+    </g>
+  );
+}
+
+// Celestial arc — sun moves from lower-left to upper-right to lower-right across years.
+// Represents the "march of time." Color tints with palette.
+function CelestialArc({ year, pal, dark }) {
+  const t = Math.max(0, Math.min(1, (year - 1849) / (2026 - 1849)));
+  // Arc: parametric — x from 50 → 950, y dips down parabolically
+  // Peak around t=0.5 (around 1938)
+  const x = 60 + t * 880;
+  // Parabola: y = 150 - 90*sin(πt), so peak (smallest y) at middle
+  const y = 150 - 90 * Math.sin(Math.PI * t);
+  const r = 28;
+  const sunColor = dark ? '#e8ecf5' : pal.sun; // moon if dark
+  return (
+    <g style={{ pointerEvents: 'none' }}>
+      {/* soft halo */}
+      <circle cx={x} cy={y} r={r * 2.2} fill={sunColor} opacity="0.12"/>
+      <circle cx={x} cy={y} r={r * 1.4} fill={sunColor} opacity="0.22"/>
+      {/* sun disc */}
+      <circle cx={x} cy={y} r={r} fill={sunColor} opacity={dark ? 0.9 : 0.75}/>
+      {dark && (
+        // moon crater shadow
+        <circle cx={x + 8} cy={y - 4} r={r * 0.92} fill={pal.skyBot} opacity="0.5"/>
+      )}
+    </g>
+  );
+}
+
+// Rolling fog drift
+function FogLayer({ pal, intensity = 1, t = 0 }) {
+  const bands = [];
+  for (let i = 0; i < 3; i++) {
+    const dx = ((t * (10 + i * 6)) % 1400) - 200;
+    const y = 200 + i * 60;
+    bands.push(
+      <ellipse key={i} cx={dx} cy={y} rx={500} ry={40 - i*6}
+        fill={pal.fog} opacity={0.7 * intensity} />
+    );
+  }
+  return <g style={{ pointerEvents: 'none' }}>{bands}</g>;
+}
+
+// Bridges
+function GoldenGate({ pal, opacity }) {
+  // Left edge, reddish
+  return (
+    <g opacity={opacity} style={{ pointerEvents: 'none' }}>
+      <path d="M -20 280 Q 60 260, 100 280" stroke={pal.accent} strokeWidth="2" fill="none" opacity="0.8"/>
+      <rect x="30" y="220" width="5" height="110" fill={pal.accent}/>
+      <rect x="95" y="235" width="5" height="95" fill={pal.accent}/>
+      {/* tower tops */}
+      <rect x="28" y="215" width="9" height="8" fill={pal.accent}/>
+      <rect x="93" y="230" width="9" height="8" fill={pal.accent}/>
+      {/* cables */}
+      <path d="M 30 220 Q 65 270, 100 235" stroke={pal.accent} strokeWidth="1.5" fill="none" opacity="0.9"/>
+      <path d="M 30 220 L 0 265" stroke={pal.accent} strokeWidth="1.2" fill="none"/>
+      <path d="M 100 235 L 140 270" stroke={pal.accent} strokeWidth="1.2" fill="none"/>
+      {/* deck */}
+      <rect x="-20" y="278" width="180" height="3" fill={pal.accent} opacity="0.85"/>
+    </g>
+  );
+}
+
+function BayBridge({ pal, opacity }) {
+  return (
+    <g opacity={opacity} style={{ pointerEvents: 'none' }}>
+      {/* right edge suspension */}
+      <rect x="945" y="245" width="4" height="80" fill={pal.bldgC}/>
+      <rect x="985" y="245" width="4" height="80" fill={pal.bldgC}/>
+      <path d="M 900 300 Q 947 255, 987 300" stroke={pal.bldgC} strokeWidth="1.3" fill="none"/>
+      <path d="M 987 300 Q 1000 285, 1020 300" stroke={pal.bldgC} strokeWidth="1.3" fill="none"/>
+      <rect x="890" y="303" width="140" height="2" fill={pal.bldgC}/>
+    </g>
+  );
+}
+
+// Ships on the bay (1850s)
+function Ships({ opacity, pal }) {
+  if (opacity <= 0.01) return null;
+  const ships = [
+    { x: 150, scale: 1 }, { x: 400, scale: 0.8 }, { x: 650, scale: 1.1 }, { x: 830, scale: 0.7 },
+  ];
+  return (
+    <g opacity={opacity} style={{ pointerEvents: 'none' }}>
+      {ships.map((s, i) => (
+        <g key={i} transform={`translate(${s.x} 305) scale(${s.scale})`}>
+          <path d="M -18 0 L 18 0 L 14 6 L -14 6 Z" fill={pal.bldgC}/>
+          <rect x="-1" y="-28" width="2" height="28" fill={pal.bldgC}/>
+          <path d="M 0 -28 L 12 -8 L 0 -8 Z" fill={pal.bldgA} opacity="0.85"/>
+          <path d="M 0 -22 L -10 -6 L 0 -6 Z" fill={pal.bldgA} opacity="0.85"/>
+        </g>
+      ))}
+    </g>
+  );
+}
+
+// Seagulls — a few simple curves, always drifting
+function Seagulls({ t }) {
+  const birds = [
+    { x: 120, y: 80, d: 1 }, { x: 250, y: 110, d: -1 }, { x: 700, y: 70, d: 1 }, { x: 820, y: 130, d: -1 },
+  ];
+  return (
+    <g style={{ pointerEvents: 'none' }}>
+      {birds.map((b, i) => {
+        const dx = ((t * 15 + i * 90) % 1100) * b.d;
+        const x = b.x + (dx % 400);
+        const flap = Math.sin(t * 4 + i) * 2;
+        return (
+          <g key={i} transform={`translate(${x} ${b.y + flap})`}>
+            <path d="M -8 0 Q -4 -4, 0 0 Q 4 -4, 8 0" stroke="rgba(0,0,0,0.35)" strokeWidth="1.2" fill="none"/>
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+window.Skyline = {
+  paletteFor, renderBuilding, FogLayer, GoldenGate, BayBridge, Ships, Seagulls,
+  HillsBackdrop, CelestialArc,
+};
+
+
+// Main SF Skyline prototype — portrait iOS, horizontal drag timeline
+const { useState, useEffect, useRef, useMemo } = React;
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "palette": "shift",
+  "dark": false,
+  "showLabels": true,
+  "fog": 1,
+  "autoPlay": false,
+  "autoSpeed": 1,
+  "artStyle": "illustrated"
+}/*EDITMODE-END*/;
+
+// Helpers
+function fmt(n) { return n.toLocaleString('en-US'); }
+function yearFromT(t) { return Math.round(skylineLerp(1849, 2026, t)); }
+function tFromYear(y) { return (y - 1849) / (2026 - 1849); }
+const skylineLerp = (a, b, t) => a + (b - a) * t;
+
+// Era interp — returns a synthesized "current era" object for any year
+function interpEra(year) {
+  const eras = window.ERAS;
+  if (year <= eras[0].year) return eras[0];
+  if (year >= eras[eras.length-1].year) return eras[eras.length-1];
+  let prev = eras[0], next = eras[1];
+  for (let i = 0; i < eras.length - 1; i++) {
+    if (year >= eras[i].year && year <= eras[i+1].year) {
+      prev = eras[i]; next = eras[i+1]; break;
+    }
+  }
+  // "current era" = closer of the two
+  return Math.abs(year - prev.year) <= Math.abs(year - next.year) ? prev : next;
+}
+
+function interpPop(year) {
+  const eras = window.ERAS;
+  if (year <= eras[0].year) return eras[0].pop;
+  if (year >= eras[eras.length-1].year) return eras[eras.length-1].pop;
+  for (let i = 0; i < eras.length - 1; i++) {
+    if (year >= eras[i].year && year <= eras[i+1].year) {
+      const t = (year - eras[i].year) / (eras[i+1].year - eras[i].year);
+      return Math.round(lerp(eras[i].pop, eras[i+1].pop, t));
+    }
+  }
+  return 0;
+}
+
+function SFSkylineApp() {
+  const [year, setYear] = useState(() => {
+    const stored = +localStorage.getItem('sfskyline.year');
+    return stored >= 1849 && stored <= 2026 ? stored : 1850;
+  });
+  const [tweaks, setTweaks] = useState(TWEAK_DEFAULTS);
+  const [tweaksOpen, setTweaksOpen] = useState(false);
+  const [tappedBldg, setTappedBldg] = useState(null);
+  const [shakeAmt, setShakeAmt] = useState(0);
+  const [time, setTime] = useState(0); // animation time
+  const dragRef = useRef(null);
+  const timelineRef = useRef(null);
+
+  // Persist year
+  useEffect(() => { localStorage.setItem('sfskyline.year', year); }, [year]);
+
+  // Register edit-mode listener
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.data?.type === '__activate_edit_mode') setTweaksOpen(true);
+      if (e.data?.type === '__deactivate_edit_mode') setTweaksOpen(false);
+    };
+    window.addEventListener('message', handler);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', handler);
+  }, []);
+
+  const updateTweak = (k, v) => {
+    setTweaks(prev => {
+      const next = { ...prev, [k]: v };
+      window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [k]: v } }, '*');
+      return next;
+    });
+  };
+
+  // Animation loop
+  useEffect(() => {
+    let raf, last = performance.now();
+    const tick = (now) => {
+      const dt = (now - last) / 1000;
+      last = now;
+      setTime(t => t + dt);
+      if (tweaks.autoPlay) {
+        setYear(y => {
+          const ny = y + tweaks.autoSpeed * dt * 4;
+          return ny >= 2026 ? 1849 : ny;
+        });
+      }
+      // shake decay
+      setShakeAmt(s => s > 0.01 ? s * Math.pow(0.2, dt) : 0);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [tweaks.autoPlay, tweaks.autoSpeed]);
+
+  // Trigger shake when hitting 1906
+  const prevYearRef = useRef(year);
+  useEffect(() => {
+    const prev = prevYearRef.current;
+    if (prev !== 1906 && Math.round(year) === 1906) setShakeAmt(1);
+    prevYearRef.current = Math.round(year);
+  }, [year]);
+
+  // Timeline drag
+  useEffect(() => {
+    const el = timelineRef.current;
+    if (!el) return;
+    const onDown = (e) => {
+      e.preventDefault();
+      dragRef.current = { active: true };
+      handleMove(e);
+    };
+    const onMove = (e) => {
+      if (!dragRef.current?.active) return;
+      handleMove(e);
+    };
+    const onUp = () => { dragRef.current = null; };
+    const handleMove = (e) => {
+      const rect = el.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const x = (clientX - rect.left) / rect.width;
+      const clamped = Math.max(0, Math.min(1, x));
+      setYear(Math.round(lerp(1849, 2026, clamped)));
+    };
+    el.addEventListener('mousedown', onDown);
+    el.addEventListener('touchstart', onDown, { passive: false });
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchend', onUp);
+    return () => {
+      el.removeEventListener('mousedown', onDown);
+      el.removeEventListener('touchstart', onDown);
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('touchmove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('touchend', onUp);
+    };
+  }, []);
+
+  const yNum = Math.round(year);
+  const t = tFromYear(yNum);
+  const pal = window.Skyline.paletteFor(yNum, tweaks.palette, tweaks.dark);
+  const era = interpEra(yNum);
+  const pop = interpPop(yNum);
+  const isFire = yNum === 1906;
+
+  // Which buildings are visible
+  const visBuildings = useMemo(() => {
+    return window.BUILDINGS
+      .map(b => {
+        const buildT = Math.min(1, Math.max(0, (yNum - b.firstYear) / 4)); // fade in over 4 yrs
+        const removed = b.removeYear !== undefined && yNum >= b.removeYear;
+        const op = removed ? 0 : buildT;
+        return { b, opacity: op };
+      })
+      .filter(x => x.opacity > 0.01);
+  }, [yNum]);
+
+  // Assign depth (0=back, 1=mid, 2=fore).
+  // Back = buildings on hills (elev > 0) or edges of frame
+  // Mid  = FiDi cluster (core)
+  // Fore = waterfront + foreground shacks
+  const buildingsWithDepth = visBuildings.map(({ b, opacity }) => {
+    let depth = 1;
+    if (b.elev && b.elev > 20) depth = 0;          // on hills = background
+    else if (b.x < 180 || b.x > 780) depth = 0;    // edges
+    else if (b.h < 60) depth = 2;                   // small shacks = foreground
+    else depth = 1;                                  // FiDi core
+    return { b, opacity, depth };
+  });
+
+  const shakeX = shakeAmt * (Math.random() - 0.5) * 12;
+  const shakeY = shakeAmt * (Math.random() - 0.5) * 8;
+
+  // Earthquake fire flame glow
+  const fireGlow = isFire ? 1 : 0;
+
+  return (
+    <div style={{
+      width: '100%', height: '100%', position: 'relative',
+      background: tweaks.dark ? '#000' : `linear-gradient(180deg, ${pal.skyTop}, ${pal.skyBot})`,
+      overflow: 'hidden',
+      fontFamily: '"Inter", -apple-system, system-ui, sans-serif',
+      color: tweaks.dark ? '#fff' : '#1a1410',
+    }}>
+      {/* Sky gradient (animated via bg color above) */}
+
+      {/* Scene SVG */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, bottom: 200,
+        transform: `translate(${shakeX}px, ${shakeY}px)`,
+        transition: shakeAmt > 0.9 ? 'none' : 'transform 0.05s',
+      }}>
+        <svg viewBox="0 0 1000 600" preserveAspectRatio="xMidYEnd slice"
+          style={{ width: '100%', height: '100%', display: 'block' }}>
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={pal.skyTop}/>
+              <stop offset="100%" stopColor={pal.skyBot}/>
+            </linearGradient>
+            <linearGradient id="hills" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={pal.bldgA} stopOpacity="0.85"/>
+              <stop offset="100%" stopColor={pal.bldgA} stopOpacity="1"/>
+            </linearGradient>
+            <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={pal.water} stopOpacity="0.8"/>
+              <stop offset="100%" stopColor={pal.water}/>
+            </linearGradient>
+            <filter id="softshadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="1.5"/>
+            </filter>
+            {isFire && (
+              <radialGradient id="fire" cx="0.5" cy="0.8" r="0.8">
+                <stop offset="0%" stopColor="#ffdb7a" stopOpacity="0.95"/>
+                <stop offset="40%" stopColor="#f47c3c" stopOpacity="0.7"/>
+                <stop offset="100%" stopColor="#8b2a1a" stopOpacity="0"/>
+              </radialGradient>
+            )}
+          </defs>
+
+          {/* Celestial arc — sun/moon tracking the march of time */}
+          <window.Skyline.CelestialArc year={yNum} pal={pal} dark={tweaks.dark}/>
+
+          {/* Background hills (Twin Peaks + Nob/Russian/Telegraph/Rincon) */}
+          <window.Skyline.HillsBackdrop pal={pal}/>
+
+          {/* Bridges (drawn behind foreground) */}
+          {yNum >= 1937 && <window.Skyline.GoldenGate pal={pal} opacity={Math.min(1, (yNum - 1937) / 2)}/>}
+          {yNum >= 1936 && <window.Skyline.BayBridge pal={pal} opacity={Math.min(1, (yNum - 1936) / 2)}/>}
+
+          {/* Buildings, draw back→fore */}
+          <g transform="translate(0 400)">
+            {/* depth 0 (back) */}
+            {buildingsWithDepth.filter(x => x.depth === 0).map(x =>
+              window.Skyline.renderBuilding(x.b, pal, x.opacity, 0, tweaks.showLabels, (info) => setTappedBldg(info))
+            )}
+            {/* depth 1 (mid) */}
+            {buildingsWithDepth.filter(x => x.depth === 1).map(x =>
+              window.Skyline.renderBuilding(x.b, pal, x.opacity, 1, tweaks.showLabels, (info) => setTappedBldg(info))
+            )}
+            {/* depth 2 (fore) */}
+            {buildingsWithDepth.filter(x => x.depth === 2).map(x =>
+              window.Skyline.renderBuilding(x.b, pal, x.opacity, 2, tweaks.showLabels, (info) => setTappedBldg(info))
+            )}
+          </g>
+
+          {/* Fire glow over 1906 */}
+          {isFire && (
+            <>
+              <ellipse cx="500" cy="400" rx="500" ry="120" fill="url(#fire)" opacity="0.9"/>
+              {/* smoke */}
+              {[0,1,2,3,4].map(i => (
+                <ellipse key={i}
+                  cx={200 + i*150 + Math.sin(time + i)*8}
+                  cy={200 - i*8}
+                  rx={120} ry={30 + i*4}
+                  fill="rgba(50,30,20,0.4)"/>
+              ))}
+            </>
+          )}
+
+          {/* Ships — only in early years */}
+          {yNum < 1915 && (
+            <window.Skyline.Ships pal={pal}
+              opacity={Math.max(0, Math.min(1, (1910 - yNum) / 40))}/>
+          )}
+
+          {/* Water */}
+          <rect x="0" y="400" width="1000" height="200" fill="url(#water)"/>
+          {/* water highlights */}
+          {[...Array(12)].map((_, i) => (
+            <path key={i}
+              d={`M ${i*85 + (time*10)%85} ${440 + (i%3)*20} q 15 ${-2 - Math.sin(time+i)} 30 0`}
+              stroke={pal.sun} strokeWidth="1" fill="none" opacity="0.25"/>
+          ))}
+          {/* Reflections of buildings (vertical streaks) */}
+          <g opacity="0.18" transform="translate(0 400) scale(1 -0.3)" style={{ transformOrigin: 'center' }}>
+            {buildingsWithDepth.filter(x => x.b.h > 150).slice(0, 6).map(x => (
+              <rect key={x.b.id} x={x.b.x} y={-x.b.h*0.8} width={x.b.w} height={x.b.h*0.8}
+                fill={pal.bldgB}/>
+            ))}
+          </g>
+
+          {/* Fog layer */}
+          {tweaks.fog > 0.05 && <window.Skyline.FogLayer pal={pal} intensity={tweaks.fog} t={time * 0.1}/>}
+
+          {/* Seagulls */}
+          <window.Skyline.Seagulls t={time}/>
+        </svg>
+      </div>
+
+      {/* Top HUD: year big number + era title */}
+      <div style={{
+        position: 'absolute', top: 72, left: 0, right: 0,
+        textAlign: 'center', zIndex: 10,
+        pointerEvents: 'none',
+      }}>
+        <div style={{
+          fontFamily: '"Playfair Display", "Times New Roman", serif',
+          fontSize: 76, fontWeight: 800, lineHeight: 1,
+          color: tweaks.dark ? '#fff' : '#1a1008',
+          letterSpacing: -2,
+          textShadow: tweaks.dark ? 'none' : '0 1px 0 rgba(255,255,255,0.3)',
+          fontFeatureSettings: '"lnum"',
+        }}>{yNum}</div>
+        <div style={{
+          marginTop: 4, fontSize: 13, fontWeight: 600,
+          letterSpacing: 3, textTransform: 'uppercase',
+          color: tweaks.dark ? 'rgba(255,255,255,0.7)' : 'rgba(26,16,8,0.7)',
+        }}>{era.title}</div>
+      </div>
+
+      {/* Caption card — floats above water */}
+      <div style={{
+        position: 'absolute', left: 16, right: 16, bottom: 210,
+        background: tweaks.dark ? 'rgba(20,14,10,0.72)' : 'rgba(255,252,246,0.82)',
+        backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+        border: `0.5px solid ${tweaks.dark ? 'rgba(255,255,255,0.12)' : 'rgba(26,16,8,0.08)'}`,
+        borderRadius: 18, padding: '14px 16px',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+        zIndex: 10,
+      }}>
+        <div style={{
+          display: 'flex', alignItems: 'baseline', gap: 8,
+          fontFamily: '"Playfair Display", serif',
+          fontSize: 13, letterSpacing: 1, textTransform: 'uppercase',
+          color: tweaks.dark ? 'rgba(255,255,255,0.55)' : 'rgba(26,16,8,0.55)',
+          marginBottom: 6,
+        }}>
+          <span>{era.landmark}</span>
+        </div>
+        <div style={{
+          fontSize: 14, lineHeight: 1.5,
+          color: tweaks.dark ? 'rgba(255,255,255,0.88)' : '#2a1d12',
+          textWrap: 'pretty',
+        }}>
+          {era.caption}
+        </div>
+        <div style={{
+          marginTop: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          paddingTop: 10,
+          borderTop: `0.5px solid ${tweaks.dark ? 'rgba(255,255,255,0.1)' : 'rgba(26,16,8,0.08)'}`,
+        }}>
+          <div>
+            <div style={{ fontSize: 10, letterSpacing: 1.5, textTransform: 'uppercase',
+              color: tweaks.dark ? 'rgba(255,255,255,0.5)' : 'rgba(26,16,8,0.5)' }}>Population</div>
+            <div style={{
+              fontFamily: '"Playfair Display", serif',
+              fontSize: 22, fontWeight: 700,
+              color: tweaks.dark ? '#fff' : '#1a1008',
+              lineHeight: 1.1,
+            }}>{fmt(pop)}</div>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: 10, letterSpacing: 1.5, textTransform: 'uppercase',
+              color: tweaks.dark ? 'rgba(255,255,255,0.5)' : 'rgba(26,16,8,0.5)' }}>Tallest</div>
+            <div style={{
+              fontFamily: '"Playfair Display", serif',
+              fontSize: 14, fontWeight: 600,
+              color: tweaks.dark ? '#fff' : '#1a1008',
+              lineHeight: 1.2,
+            }}>{tallestFor(yNum)}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Timeline strip at bottom */}
+      <TimelineStrip
+        ref={timelineRef}
+        year={yNum}
+        dark={tweaks.dark}
+        pal={pal}
+        onPlayToggle={() => updateTweak('autoPlay', !tweaks.autoPlay)}
+        playing={tweaks.autoPlay}
+      />
+
+      {/* Tapped building info */}
+      {tappedBldg && (
+        <div
+          onClick={() => setTappedBldg(null)}
+          style={{
+            position: 'absolute', top: 180, left: 16, right: 16,
+            background: 'rgba(20,14,10,0.88)', color: '#fff',
+            borderRadius: 14, padding: '10px 14px', zIndex: 20,
+            fontSize: 13, lineHeight: 1.4, cursor: 'pointer',
+            backdropFilter: 'blur(16px)',
+          }}>
+          <div style={{ fontSize: 10, letterSpacing: 2, opacity: 0.6 }}>LANDMARK</div>
+          <div style={{ fontFamily: '"Playfair Display", serif', fontSize: 18, fontWeight: 700 }}>{tappedBldg.name}</div>
+          <div style={{ opacity: 0.7 }}>Built {tappedBldg.year} — tap to dismiss</div>
+        </div>
+      )}
+
+      {/* Tweaks panel */}
+      {tweaksOpen && (
+        <TweaksPanel tweaks={tweaks} onChange={updateTweak} onClose={() => setTweaksOpen(false)}/>
+      )}
+    </div>
+  );
+}
+
+// Tallest building lookup
+function tallestFor(year) {
+  const buildings = window.BUILDINGS.filter(b =>
+    b.firstYear <= year && (b.removeYear === undefined || year < b.removeYear) && b.name
+  );
+  if (!buildings.length) return '—';
+  const sorted = [...buildings].sort((a, b) => b.h - a.h);
+  return sorted[0].name;
+}
+
+// Timeline Strip — horizontal drag scrubber w/ decade ticks
+const TimelineStrip = React.forwardRef(({ year, dark, pal, onPlayToggle, playing }, ref) => {
+  const markers = window.ERAS;
+  const t = tFromYear(year);
+  const decades = [];
+  for (let y = 1850; y <= 2020; y += 10) decades.push(y);
+  decades.push(2026);
+
+  return (
+    <div style={{
+      position: 'absolute', bottom: 0, left: 0, right: 0,
+      height: 200,
+      background: dark
+        ? 'linear-gradient(180deg, rgba(10,8,6,0) 0%, rgba(10,8,6,0.85) 40%)'
+        : 'linear-gradient(180deg, rgba(255,252,246,0) 0%, rgba(255,252,246,0.92) 35%)',
+      padding: '30px 0 34px',
+      backdropFilter: 'blur(8px)',
+      zIndex: 15,
+    }}>
+      {/* Play + year label row */}
+      <div style={{
+        display: 'flex', alignItems: 'center', padding: '0 20px',
+        marginBottom: 12,
+      }}>
+        <button
+          onClick={onPlayToggle}
+          style={{
+            width: 36, height: 36, borderRadius: '50%',
+            background: dark ? 'rgba(255,255,255,0.12)' : 'rgba(26,16,8,0.08)',
+            border: 'none', color: dark ? '#fff' : '#1a1008',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', padding: 0,
+          }}>
+          {playing ? (
+            <svg width="12" height="14" viewBox="0 0 12 14">
+              <rect x="0" y="0" width="4" height="14" fill="currentColor"/>
+              <rect x="8" y="0" width="4" height="14" fill="currentColor"/>
+            </svg>
+          ) : (
+            <svg width="12" height="14" viewBox="0 0 12 14">
+              <polygon points="0,0 12,7 0,14" fill="currentColor"/>
+            </svg>
+          )}
+        </button>
+        <div style={{
+          marginLeft: 12, flex: 1,
+          fontSize: 11, letterSpacing: 2, textTransform: 'uppercase',
+          color: dark ? 'rgba(255,255,255,0.5)' : 'rgba(26,16,8,0.5)',
+        }}>
+          Drag ↔ to travel through time
+        </div>
+        <div style={{
+          fontFamily: '"Playfair Display", serif', fontSize: 14, fontWeight: 700,
+          color: dark ? '#fff' : '#1a1008',
+          fontFeatureSettings: '"lnum"',
+        }}>{year}</div>
+      </div>
+
+      {/* Main scrubber track */}
+      <div ref={ref} style={{
+        position: 'relative', height: 62, margin: '0 20px',
+        cursor: 'grab', userSelect: 'none', touchAction: 'none',
+      }}>
+        {/* track */}
+        <div style={{
+          position: 'absolute', top: 30, left: 0, right: 0, height: 2,
+          background: dark ? 'rgba(255,255,255,0.15)' : 'rgba(26,16,8,0.12)',
+        }}/>
+
+        {/* decade ticks */}
+        {decades.map(d => {
+          const p = tFromYear(d) * 100;
+          const major = d % 50 === 0 || d === 2026;
+          return (
+            <div key={d} style={{
+              position: 'absolute', left: `${p}%`, top: 24,
+              transform: 'translateX(-50%)',
+              width: 1, height: major ? 14 : 8,
+              background: dark ? 'rgba(255,255,255,0.3)' : 'rgba(26,16,8,0.25)',
+            }}/>
+          );
+        })}
+
+        {/* era dot markers */}
+        {markers.map((m, i) => {
+          const p = tFromYear(m.year) * 100;
+          const active = Math.abs(m.year - year) < 5;
+          return (
+            <div key={i} style={{
+              position: 'absolute', left: `${p}%`, top: 25,
+              transform: 'translateX(-50%)',
+              width: active ? 12 : 8, height: active ? 12 : 8,
+              background: active ? pal.accent : (dark ? 'rgba(255,255,255,0.5)' : 'rgba(26,16,8,0.4)'),
+              borderRadius: '50%',
+              transition: 'all 0.2s',
+              border: active ? `2px solid ${dark ? '#000' : '#fff'}` : 'none',
+              boxSizing: 'border-box',
+            }}/>
+          );
+        })}
+
+        {/* decade labels for majors */}
+        {decades.filter(d => d % 50 === 0 || d === 2026).map(d => {
+          const p = tFromYear(d) * 100;
+          return (
+            <div key={d} style={{
+              position: 'absolute', left: `${p}%`, top: 44,
+              transform: 'translateX(-50%)',
+              fontSize: 10, letterSpacing: 1, fontWeight: 500,
+              color: dark ? 'rgba(255,255,255,0.55)' : 'rgba(26,16,8,0.55)',
+              fontFeatureSettings: '"lnum"',
+            }}>{d}</div>
+          );
+        })}
+
+        {/* current-position playhead */}
+        <div style={{
+          position: 'absolute', left: `${t*100}%`, top: 6,
+          transform: 'translateX(-50%)',
+          width: 3, height: 36,
+          background: pal.accent,
+          borderRadius: 2,
+          boxShadow: `0 0 12px ${pal.accent}`,
+          pointerEvents: 'none',
+        }}/>
+        <div style={{
+          position: 'absolute', left: `${t*100}%`, top: 0,
+          transform: 'translateX(-50%)',
+          width: 0, height: 0,
+          borderLeft: '6px solid transparent',
+          borderRight: '6px solid transparent',
+          borderTop: `8px solid ${pal.accent}`,
+          pointerEvents: 'none',
+        }}/>
+      </div>
+    </div>
+  );
+});
+
+// Tweaks Panel
+function TweaksPanel({ tweaks, onChange, onClose }) {
+  return (
+    <div style={{
+      position: 'absolute', top: 140, right: 12, zIndex: 50,
+      width: 230,
+      background: 'rgba(20,14,10,0.92)',
+      backdropFilter: 'blur(20px)',
+      color: '#fff', borderRadius: 16, padding: 14,
+      fontSize: 12, fontFamily: 'Inter, system-ui',
+      boxShadow: '0 12px 32px rgba(0,0,0,0.35)',
+      border: '0.5px solid rgba(255,255,255,0.12)',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+        <div style={{ fontFamily: '"Playfair Display", serif', fontWeight: 700, fontSize: 15 }}>Tweaks</div>
+        <button onClick={onClose} style={{
+          background: 'none', border: 'none', color: '#fff', fontSize: 16, cursor: 'pointer', padding: 0,
+        }}>×</button>
+      </div>
+
+      <TweakRow label="Palette">
+        <Seg value={tweaks.palette} onChange={v => onChange('palette', v)} options={[
+          { v: 'shift', l: 'Shift' }, { v: 'fog', l: 'Fog' }, { v: 'sunset', l: 'Sunset' }
+        ]}/>
+      </TweakRow>
+
+      <TweakRow label="Mode">
+        <Seg value={tweaks.dark ? 'night' : 'day'} onChange={v => onChange('dark', v === 'night')} options={[
+          { v: 'day', l: 'Day' }, { v: 'night', l: 'Night' }
+        ]}/>
+      </TweakRow>
+
+      <TweakRow label="Labels">
+        <Toggle on={tweaks.showLabels} onChange={v => onChange('showLabels', v)}/>
+      </TweakRow>
+
+      <TweakRow label="Fog">
+        <Slider value={tweaks.fog} min={0} max={1.5} step={0.1} onChange={v => onChange('fog', v)}/>
+      </TweakRow>
+
+      <TweakRow label="Speed">
+        <Slider value={tweaks.autoSpeed} min={0.3} max={4} step={0.1} onChange={v => onChange('autoSpeed', v)}/>
+      </TweakRow>
+    </div>
+  );
+}
+
+function TweakRow({ label, children }) {
+  return (
+    <div style={{ marginBottom: 10 }}>
+      <div style={{ fontSize: 10, letterSpacing: 1.5, textTransform: 'uppercase',
+        color: 'rgba(255,255,255,0.5)', marginBottom: 5 }}>{label}</div>
+      {children}
+    </div>
+  );
+}
+function Seg({ value, onChange, options }) {
+  return (
+    <div style={{ display: 'flex', background: 'rgba(255,255,255,0.08)', borderRadius: 8, padding: 2 }}>
+      {options.map(o => (
+        <button key={o.v} onClick={() => onChange(o.v)} style={{
+          flex: 1, padding: '5px 4px', fontSize: 11,
+          background: value === o.v ? 'rgba(255,255,255,0.2)' : 'transparent',
+          color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer',
+          fontFamily: 'inherit',
+        }}>{o.l}</button>
+      ))}
+    </div>
+  );
+}
+function Toggle({ on, onChange }) {
+  return (
+    <button onClick={() => onChange(!on)} style={{
+      width: 40, height: 22, borderRadius: 11, padding: 2,
+      background: on ? '#3a8' : 'rgba(255,255,255,0.15)',
+      border: 'none', cursor: 'pointer', display: 'flex',
+      alignItems: 'center', justifyContent: on ? 'flex-end' : 'flex-start',
+      transition: 'all 0.2s',
+    }}>
+      <div style={{ width: 18, height: 18, borderRadius: '50%', background: '#fff' }}/>
+    </button>
+  );
+}
+function Slider({ value, min, max, step, onChange }) {
+  return (
+    <input type="range" value={value} min={min} max={max} step={step}
+      onChange={e => onChange(+e.target.value)}
+      style={{ width: '100%', accentColor: '#e8a65a' }}/>
+  );
+}
+
+window.SFSkylineApp = SFSkylineApp;
+
+
+
+function mount() {
+  const PhoneFrame = () => (
+    <IOSDevice width={390} height={844} dark={false}>
+      <div style={{ width: '100%', height: '100%' }}>
+        <SFSkylineApp />
+      </div>
+    </IOSDevice>
+  );
+  ReactDOM.createRoot(document.getElementById('root')).render(<PhoneFrame/>);
+}
+mount();
+
+function fit() {
+  const stage = document.getElementById('stage');
+  const pad = 24;
+  const w = 390 + pad*2, h = 844 + pad*2;
+  const sx = window.innerWidth / w;
+  const sy = window.innerHeight / h;
+  const s = Math.min(1, Math.min(sx, sy));
+  stage.style.transform = `scale(${s})`;
+}
+window.addEventListener('resize', fit);
+setTimeout(fit, 50);
+
+  </script>
+</body>
+</html>
